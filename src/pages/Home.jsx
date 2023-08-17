@@ -30,7 +30,7 @@ const Home = () => {
     return (
       <>
         <h2>if you don't have account then create an account.</h2> 
-         <h2> Or if you have already an account please loged In.</h2>
+         <h2> Or if you have already an account please loged.</h2>
         <Link to="/authentication">
           <Button variant="contained">Registration</Button>
         </Link>
