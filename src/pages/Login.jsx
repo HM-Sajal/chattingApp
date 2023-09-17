@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Image from '../components/Image';
 import bg from '../assets/login_bg.png';
 import Flex from '../components/Flex';
@@ -11,19 +11,28 @@ import {FcGoogle} from 'react-icons/fc';
 import {AiFillEyeInvisible, AiFillEye} from 'react-icons/ai';
 import Alert from '@mui/material/Alert';
 import { getAuth, GoogleAuthProvider,signInWithPopup, signInWithEmailAndPassword} from "firebase/auth";
+import { getDatabase, ref, set, push } from "firebase/database";
 import { LineWave } from 'react-loader-spinner';
 import { toast } from 'react-toastify';
 import {BsFacebook} from 'react-icons/bs';
 import { logedUser } from '../slices/userSlice';
-import {useDispatch } from 'react-redux';
+import {useDispatch, useSelector } from 'react-redux';
 
 const Login = () => {
   const auth = getAuth();
+  const db = getDatabase();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   let [showPwd, setShowPwd] = useState(true);
   let [loginLoad, setLoginLoad] = useState(false);
+  const data = useSelector(state => state.logedUser.value)
 
+// this is useEffect check if user loged in or not 
+  useEffect(() => {
+    if(data){
+      navigate("/");
+    }
+  },[])
 // this formData variable using for storing the inputValue of users
   let [formData, setFormData] = useState({
     email: "",
@@ -34,7 +43,15 @@ let handleDirectLogin = () => {
   const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider).then((user)=>{
     const {email} = user.user;
+    console.log(user.user)
     navigate("/");
+    dispatch(logedUser(user.user))
+      localStorage.setItem("user", JSON.stringify(user.user))
+    set(push(ref(db, 'users')), {
+      username: user.user.displayName,
+      email: user.user.email,
+      profile_picture : user.user.photoURL
+    });
   }).catch((error) => {
     console.error("Error signing in with Google:", error);
   });
@@ -64,7 +81,6 @@ let handleFacebookLogin = () => {
   let handleAuthentication = () => {
     setLoginLoad(true);
     let newValidationErr = {};
-    console.log(newValidationErr);
     if(!formData.email){
       newValidationErr.emailErr = "Email required!";
     }
@@ -85,12 +101,13 @@ let handleFacebookLogin = () => {
     //if user data is correct --> loged In
     signInWithEmailAndPassword(auth, formData.email, formData.password).then((user)=>{
       setLoginLoad(false)
-      if(user.user.emailVerified){
+      // if(user.user.emailVerified){
         navigate("/")
         dispatch(logedUser(user.user))
-      }else{
-        toast.error("Please varify your email address!");
-      }
+        localStorage.setItem("user", JSON.stringify(user.user))
+      // }else{
+      //   toast.error("Please varify your email address!");
+      // }
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -120,7 +137,7 @@ let handleFacebookLogin = () => {
             <Link onClick={handleFacebookLogin} className='gamil_login' to="#">
               <Paragraph className="gamil_login--content"><BsFacebook style={{fontSize: '20px'}}/> Login with Google</Paragraph>
             </Link>
-            <TextField onChange={handleChange} name='email' className='register_inputField' type="email" id="standard-basic" label="Email Address" variant="standard" />
+            <TextField onChange={handleChange} name='email' className='register_inputField' type="email" id="password-input" label="Email Address" variant="standard" />
             {validationErr.emailErr &&
               <Alert className='validationErr' severity="warning">{validationErr.emailErr}</Alert>
             }

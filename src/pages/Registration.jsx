@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from '../components/Image';
 import bg from '../assets/authentication_bg.png';
 import Flex from '../components/Flex';
@@ -9,16 +9,25 @@ import Paragraph from '../components/Paragraph';
 import { Link, useNavigate } from 'react-router-dom';
 import {AiFillEyeInvisible, AiFillEye} from 'react-icons/ai';
 import Alert from '@mui/material/Alert';
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
+import { getDatabase, ref, set, push } from "firebase/database";
 import { LineWave } from 'react-loader-spinner';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useSelector } from 'react-redux';
 
 const Registration = () => {
   const auth = getAuth();
+  const db = getDatabase();
   let [showPwd, setShowPwd] = useState(true);
   let [registerLoad, setRegisterLoad] = useState(false);
   let navigate = useNavigate();
+  const data = useSelector(state => state.logedUser.value);
+    useEffect(() => {
+      if(data){
+        navigate("/");
+      }
+    },[])
 // this formData variable using for storing the inputValue of users
   let [formData, setFormData] = useState({
     fullName: "",
@@ -77,17 +86,28 @@ const Registration = () => {
     setRegisterLoad(true);
     // start firebase authentication
     createUserWithEmailAndPassword(auth, formData.email, formData.password).then(()=>{
-      sendEmailVerification(auth.currentUser).then(()=>{
-        setFormData({ // if the account is created --> clear the input value
-          fullName: "",
-          email: "",
-          password: ""
+      updateProfile(auth.currentUser, {
+        displayName: formData.fullName,
+        photoURL: "https://firebasestorage.googleapis.com/v0/b/chattingapp-230e0.appspot.com/o/avatar.png?alt=media&token=f9148ade-055b-40de-830b-4466a7d109bd"
+      }).then(() =>{
+        sendEmailVerification(auth.currentUser).then(()=>{
+          setFormData({ // if the account is created --> clear the input value
+            fullName: "",
+            email: "",
+            password: ""
+          })
+          setRegisterLoad(false)// loading time when clicking the register
+          setTimeout(()=>{ //if the account is created --> this setTimeOut function navigate you to the login page
+            navigate("/login")
+          },2000)
+          toast("Registration Successfull! Please verify your email address!");
+        }).then(()=>{
+          set(push(ref(db, 'users')), {
+            username: formData.fullName,
+            email: formData.email,
+            profile_picture : "https://firebasestorage.googleapis.com/v0/b/chattingapp-230e0.appspot.com/o/avatar.png?alt=media&token=f9148ade-055b-40de-830b-4466a7d109bd"
+          });
         })
-        setRegisterLoad(false)// loading time when clicking the register
-        setTimeout(()=>{ //if the account is created --> this setTimeOut function navigate you to the login page
-          navigate("/login")
-        },2000)
-        toast("Registration Successfull! Please verify your email address!");
       })
 
       })
