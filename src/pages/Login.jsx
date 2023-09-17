@@ -13,12 +13,16 @@ import Alert from '@mui/material/Alert';
 import { getAuth, GoogleAuthProvider,signInWithPopup, signInWithEmailAndPassword} from "firebase/auth";
 import { LineWave } from 'react-loader-spinner';
 import { toast } from 'react-toastify';
+import {BsFacebook} from 'react-icons/bs';
+import { logedUser } from '../slices/userSlice';
+import {useDispatch } from 'react-redux';
 
 const Login = () => {
   const auth = getAuth();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   let [showPwd, setShowPwd] = useState(true);
   let [loginLoad, setLoginLoad] = useState(false);
-  let navigate = useNavigate();
 
 // this formData variable using for storing the inputValue of users
   let [formData, setFormData] = useState({
@@ -34,6 +38,10 @@ let handleDirectLogin = () => {
   }).catch((error) => {
     console.error("Error signing in with Google:", error);
   });
+}
+//facebook login
+let handleFacebookLogin = () => {
+  
 }
 // this validationErr uses for storing the all error massege of inputErrors
   let [validationErr, setValidationErr] = useState({
@@ -79,6 +87,7 @@ let handleDirectLogin = () => {
       setLoginLoad(false)
       if(user.user.emailVerified){
         navigate("/")
+        dispatch(logedUser(user.user))
       }else{
         toast.error("Please varify your email address!");
       }
@@ -96,6 +105,10 @@ let handleDirectLogin = () => {
     });
     }
   }
+  // forgetting password --> set a new password
+  let forgotPassword = () => {
+
+  }
   return (
     <Flex className='authentication'>
     <Flex className="registration_form">
@@ -103,6 +116,9 @@ let handleDirectLogin = () => {
             <Heading className="registration_heading" as="h1" title="Login to your account!"/>
             <Link onClick={handleDirectLogin} className='gamil_login' to="#">
               <Paragraph className="gamil_login--content"><FcGoogle style={{fontSize: '20px'}}/> Login with Google</Paragraph>
+            </Link>
+            <Link onClick={handleFacebookLogin} className='gamil_login' to="#">
+              <Paragraph className="gamil_login--content"><BsFacebook style={{fontSize: '20px'}}/> Login with Google</Paragraph>
             </Link>
             <TextField onChange={handleChange} name='email' className='register_inputField' type="email" id="standard-basic" label="Email Address" variant="standard" />
             {validationErr.emailErr &&
@@ -135,6 +151,7 @@ let handleDirectLogin = () => {
             <Button onClick={handleAuthentication} className='register_button' variant="contained">Login to continue</Button>
             }
             <Paragraph className="created_account login_page--link">Don't have an account ? <Link className='signIn_page--link' to="/authentication">Sign Up</Link></Paragraph>
+            <Paragraph className="created_account login_page--link">Forgot password ? <Link className='signIn_page--link' to="/resetpassword">Click here</Link></Paragraph>
         </div>
     </Flex>
     <div className="right_img">
