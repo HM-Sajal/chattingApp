@@ -270,5 +270,9 @@ label{
     align-items: center;
     column-gap: 10px;
 }
+.fRequestBtn{
+    display: flex;
+    column-gap: 10px;
+}
 /* Home page css properties end */
 /*========== custom css end ============*/

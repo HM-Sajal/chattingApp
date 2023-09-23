@@ -85,7 +85,7 @@ const Registration = () => {
     // if user data is correct --> loged In
     setRegisterLoad(true);
     // start firebase authentication
-    createUserWithEmailAndPassword(auth, formData.email, formData.password).then(()=>{
+    createUserWithEmailAndPassword(auth, formData.email, formData.password).then((user)=>{
       updateProfile(auth.currentUser, {
         displayName: formData.fullName,
         photoURL: "https://firebasestorage.googleapis.com/v0/b/chattingapp-230e0.appspot.com/o/avatar.png?alt=media&token=f9148ade-055b-40de-830b-4466a7d109bd"
@@ -102,7 +102,7 @@ const Registration = () => {
           },2000)
           toast("Registration Successfull! Please verify your email address!");
         }).then(()=>{
-          set(push(ref(db, 'users')), {
+          set(ref(db, 'users/'+ user.user.uid), {
             username: formData.fullName,
             email: formData.email,
             profile_picture : "https://firebasestorage.googleapis.com/v0/b/chattingapp-230e0.appspot.com/o/avatar.png?alt=media&token=f9148ade-055b-40de-830b-4466a7d109bd"
