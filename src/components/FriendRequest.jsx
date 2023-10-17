@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Heading from './Heading';
 import GroupPhoto from '../assets/group.png';
 import Button from '@mui/material/Button';
-import { getDatabase, ref, onValue, set, push } from "firebase/database";
+import { getDatabase, ref, onValue, set, push, remove } from "firebase/database";
 import { useSelector } from 'react-redux';
 
 const FriendRequest = () => {
@@ -16,20 +16,24 @@ const FriendRequest = () => {
             let arr = []
             snapshot.forEach(item =>{
                 if(userInfo.uid == item.val().whorecevedid){
-                    arr.push(item.val())
+                    arr.push({...item.val(),frid:item.key} )
                 }
             })
             setFriendRequestList(arr)
         });
     },[])
-    let handleFriendRequestDelate = ()=>{
-        console.log("delate")
+    let handleFriendRequestDelate = (item)=>{
+        remove(ref(db, 'friendrequest/'+item.frid))
     }
 
-    let handleFriendRequestAccept = (user) => {
-        console.log(user)
+    let handleFriendRequestAccept = (item) => {
+        console.log("Accept",item)
+        set(push(ref(db, 'friends/')), {
+            ...item
+        }).then(()=>{
+            remove(ref(db, 'friendrequest/'+item.frid))
+        })
     }
-
     return (
         <div className='box'>
             <Heading className="group_title" as="h3" title="Friend  Request"/>
@@ -43,8 +47,8 @@ const FriendRequest = () => {
                     </div>
                 </div>
                 <div className='fRequestBtn'>
-                    <Button onClick={handleFriendRequestAccept} variant="contained">Accept</Button>
-                    <Button onClick={handleFriendRequestDelate} variant="contained" color="error">Delate</Button>
+                    <Button onClick={()=>handleFriendRequestAccept(item)} variant="contained">Accept</Button>
+                    <Button onClick={()=>handleFriendRequestDelate(item)} variant="contained" color="error">Delate</Button>
                 </div>
             </div>
             ))}  

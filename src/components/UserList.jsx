@@ -9,6 +9,7 @@ const UserList = () => {
     const db = getDatabase();
     const [userslist, setUserslist] = useState([]);
     const [friendRequestList, setFriendRequestList] = useState([]);
+    let [friendList, setFriendList] = useState([])
     const userInfo = useSelector((state) => state.logedUser.value);
 
     useEffect(() => {
@@ -27,19 +28,15 @@ const UserList = () => {
     useEffect(() => {
         const friendRequestRef = ref(db, 'friendrequest');
         onValue(friendRequestRef, (snapshot) => {
-            const arr = [];
+            let arr = [];
             snapshot.forEach(item => {
                 // Store the user IDs who have received friend requests
-                arr.push(item.val().whorecevedid);
+                arr.push(item.val().whorecevedid+item.val().whosendid);
             });
             setFriendRequestList(arr);
         });
     }, [db]);
 
-    const hasSentFriendRequest = (userId) => {
-        // Check if the current user's friend request exists in the list of friend requests
-        return friendRequestList.includes(userId);
-    };
 
     const handleFriendRequest = (info) => {
         // Send a friend request
@@ -50,7 +47,16 @@ const UserList = () => {
             whorecevedid: info.userid
         });
     };
-
+    useEffect(() => {
+        const friendRequestRef = ref(db, 'friends');
+        onValue(friendRequestRef, (snapshot) => {
+            let arr = [];
+            snapshot.forEach(item => {
+                arr.push(item.val().whorecevedid+item.val().whosendid);
+            });
+            setFriendList(arr);
+        });
+    }, [db]);
     return (
         <div className='box'>
             <Heading className="group_title" as="h3" title="User List" />
@@ -63,15 +69,19 @@ const UserList = () => {
                             <Heading className="group_heading" as="h6" title="Hi Guys, Wassup!" />
                         </div>
                     </div>
-                    {hasSentFriendRequest(item.userid) ? (
+                    {friendRequestList.includes(item.userid+userInfo.uid) || friendRequestList.includes(userInfo.uid+item.userid) ? (
                         <Button variant="contained" disabled>
                             Request Pending
                         </Button>
-                    ) : (
+                    ) : friendList.includes(item.userid+userInfo.uid) || friendList.includes(userInfo.uid+item.userid) ?
+                        <Button variant="contained">
+                            Friend
+                        </Button>
+                     : 
                         <Button onClick={() => handleFriendRequest(item)} variant="contained">
                             Add Friend
                         </Button>
-                    )}
+                    }
                 </div>
             ))}
         </div>
