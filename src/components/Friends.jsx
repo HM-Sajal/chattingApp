@@ -7,8 +7,8 @@ import { useSelector } from 'react-redux';
 
 const Friends = () => {
     const db = getDatabase();
-    let [friendList, setFriendList] = useState([])
     let userInfo = useSelector((state)=> state.logedUser.value)
+    let [friendList, setFriendList] = useState([])
 
     useEffect(()=>{
         const FriendRef = ref(db, 'friends');

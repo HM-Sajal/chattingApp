@@ -6,6 +6,8 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import TextField from '@mui/material/TextField';
+import { getDatabase, ref, onValue, set, push, remove } from "firebase/database";
+import { useSelector } from 'react-redux';
 
 const style = {
     position: 'absolute',
@@ -19,14 +21,24 @@ const style = {
     p: 4,
   };
 const GroupList = () => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  let [Gname,setGname] = useState()
-  let [Gtagname,setGtagname] = useState()
+  const db = getDatabase();
+  let userInfo = useSelector((state)=> state.logedUser.value)
+  let [gname,setGname] = useState()
+  let [gtagname,setGtagname] = useState()
 
   let handleCreateGroup = ()=>{
-      console.log(Gname,Gtagname)
+      console.log(gname,gtagname)
+      set(push(ref(db, 'group')), {
+        groupname: gname,
+        grouptag: gtagname,
+        adminid: userInfo.uid,
+        adminname: userInfo.displayName
+    }).then(()=>{
+      setOpen(false)
+    })
   }
   return (
     <div className='box'>
