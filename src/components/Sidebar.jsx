@@ -6,6 +6,7 @@ import { getAuth, signOut } from "firebase/auth";
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logedUser } from '../slices/userSlice';
+import GroupPhoto from '../assets/group.png';
 
 const Sidebar = () => {
   const auth = getAuth();

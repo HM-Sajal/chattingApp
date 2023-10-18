@@ -10,6 +10,7 @@ const UserList = () => {
     const [userslist, setUserslist] = useState([]);
     const [friendRequestList, setFriendRequestList] = useState([]);
     let [friendList, setFriendList] = useState([])
+    let [blockuser, setBlockuser] = useState([])
     const userInfo = useSelector((state) => state.logedUser.value);
 
     useEffect(() => {
@@ -57,6 +58,18 @@ const UserList = () => {
             setFriendList(arr);
         });
     }, [db]);
+
+    useEffect(()=>{
+        const BlockuserRef = ref(db, 'block');
+        onValue(BlockuserRef, (snapshot) => {
+            let arr = []
+            snapshot.forEach(item =>{
+                    arr.push(item.val().blockid+item.val().blockbyid)
+            })
+            setBlockuser(arr)
+        });
+    },[])
+    console.log("userlist block user",blockuser)
     return (
         <div className='box'>
             <Heading className="group_title" as="h3" title="User List" />
@@ -77,8 +90,11 @@ const UserList = () => {
                         <Button variant="contained">
                             Friend
                         </Button>
-                     : 
-                        <Button onClick={() => handleFriendRequest(item)} variant="contained">
+                     : blockuser.includes(item.userid+userInfo.uid) || blockuser.includes(userInfo.uid+item.userid) ?
+                     <Button variant="contained">
+                         Block
+                     </Button>
+                     :<Button onClick={() => handleFriendRequest(item)} variant="contained">
                             Add Friend
                         </Button>
                     }

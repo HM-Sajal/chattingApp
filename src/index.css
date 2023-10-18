@@ -274,5 +274,10 @@ label{
     display: flex;
     column-gap: 10px;
 }
+.group_wrapper{
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+}
 /* Home page css properties end */
 /*========== custom css end ============*/

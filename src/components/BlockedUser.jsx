@@ -20,7 +20,16 @@ const BlockedUser = () => {
             setBlockuser(arr)
         });
     },[])
-    console.log("block user",blockuser)
+    let handleUnblock = (item)=>{
+        set(push(ref(db, 'friends')), {
+            whosendname: item.blockbyname,
+            whosendid: item.blockbyid,
+            whorecevedname: item.blockname,
+            whorecevedid: item.blockid
+        }).then(()=>{
+            remove(ref(db, 'block/'+item.bid))
+        })
+    }
 
   return (
     <div className='box'>
@@ -30,11 +39,13 @@ const BlockedUser = () => {
             <div className='group_userInfo'>
                 <img src={GroupPhoto} alt="group" />
                 <div>
-                    <Heading className="group_heading" as="h4" title="Friends Reunion"/>
+                    <Heading className="group_heading" as="h4" title={item.blockbyid == userInfo.uid? item.blockname:item.blockbyname}/>
                     <Heading className="group_heading" as="h6" title="Hi Guys, Wassup!"/>
                 </div>
             </div>
-            <Button variant="contained">Join</Button>
+            {item.blockbyid == userInfo.uid&&
+                <Button variant="contained" onClick={()=>handleUnblock(item)}>Unblock</Button>
+            }
         </div>
         ))}
         
