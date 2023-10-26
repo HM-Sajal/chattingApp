@@ -279,5 +279,9 @@ label{
     justify-content: space-between;
     cursor: pointer;
 }
+.mygroup_btn{
+    display: flex;
+    gap: 10px;
+}
 /* Home page css properties end */
 /*========== custom css end ============*/

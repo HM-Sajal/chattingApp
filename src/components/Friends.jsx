@@ -15,7 +15,9 @@ const Friends = () => {
         onValue(FriendRef, (snapshot) => {
             let arr = []
             snapshot.forEach(item =>{
-                    arr.push({...item.val(),fid:item.key} )
+                if(item.val().whosendid == userInfo.uid || item.val().whorecevedid == userInfo.uid){
+                    arr.push({...item.val(),fid:item.key})
+                }
             })
             setFriendList(arr)
         });

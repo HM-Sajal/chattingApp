@@ -34,7 +34,10 @@ const MyGroup = () => {
                     <Heading className="group_heading" as="h6" title={item.grouptag}/>
                 </div>
             </div>
-            <Button variant="contained">Join</Button>
+            <div className='mygroup_btn'>
+                <Button variant="contained">RL</Button>
+                <Button variant="contained">ML</Button>
+            </div> 
         </div>
         ))}
         

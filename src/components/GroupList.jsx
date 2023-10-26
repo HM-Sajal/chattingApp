@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Heading from './Heading';
 import GroupPhoto from '../assets/group.png';
 import Button from '@mui/material/Button';
@@ -28,6 +28,20 @@ const GroupList = () => {
   let userInfo = useSelector((state)=> state.logedUser.value)
   let [gname,setGname] = useState()
   let [gtagname,setGtagname] = useState()
+  let [groupList, setGroupList] = useState([])
+
+  useEffect(()=>{
+    const GroupRef = ref(db, 'group');
+    onValue(GroupRef, (snapshot) => {
+        let arr = []
+        snapshot.forEach(item =>{
+            if(item.val().adminid != userInfo.uid){
+                arr.push(item.val())
+            }
+        })
+        setGroupList(arr)
+    });
+},[])
 
   let handleCreateGroup = ()=>{
       console.log(gname,gtagname)
@@ -46,26 +60,18 @@ const GroupList = () => {
             <Heading className="group_title" as="h3" title="Grouplist"/>
             <h2 onClick={handleOpen}>+</h2>
         </div>
-        <div className='list'>
-            <div className='group_userInfo'>
-                <img src={GroupPhoto} alt="group" />
-                <div>
-                    <Heading className="group_heading" as="h4" title="Friends Reunion"/>
-                    <Heading className="group_heading" as="h6" title="Hi Guys, Wassup!"/>
-                </div>
-            </div>
-            <Button variant="contained">Join</Button>
-        </div>
-        <div className='list'>
-            <div className='group_userInfo'>
-                <img src={GroupPhoto} alt="group" />
-                <div>
-                    <Heading className="group_heading" as="h4" title="Friends Reunion"/>
-                    <Heading className="group_heading" as="h6" title="Hi Guys, Wassup!"/>
-                </div>
-            </div>
-            <Button variant="contained">Join</Button>
-        </div>
+        {groupList.map(item=>(
+          <div className='list'>
+          <div className='group_userInfo'>
+              <img src={GroupPhoto} alt="group" />
+              <div>
+                  <Heading className="group_heading" as="h4" title={item.groupname}/>
+                  <Heading className="group_heading" as="h6" title={item.grouptag}/>
+              </div>
+          </div>
+          <Button variant="contained">Join</Button>
+      </div>
+        ))} 
         <Modal
         open={open}
         onClose={handleClose}
